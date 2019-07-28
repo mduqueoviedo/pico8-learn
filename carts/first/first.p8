@@ -23,22 +23,31 @@ function _init()
 	player.jump_height = 15
 	player.moving = false
 	
-	game.message = player.y
+	game.message = player_in_floor()
 end
 
 function _update()
 	player.moving = false
+	move_listener()
+end
 
+function _draw()
+	cls() -- clear screen
+	spr(player.sprite, player.x, player.y)
+	print(game.message)
+end
+
+function move_listener()
 	if btn(0) then
 		player.moving = true
 		player.x -= player.speed
-		move()
+		update_spr()
 	end
 
 	if btn(1) then
 		player.moving = true
 		player.x += player.speed
-		move()
+		update_spr()
 	end
 
 	-- if btn(2) then
@@ -58,15 +67,10 @@ function _update()
 	end
 end
 
-function _draw()
-	cls() -- clear screen
-	spr(player.sprite, player.x, player.y)
-	print(game.message)
-end
-
-function move()
+function update_spr()
 	player.moving = true
 	player.sprite += 1
+
 	if player.sprite > 3 then
 	  player.sprite = 1
 	end
