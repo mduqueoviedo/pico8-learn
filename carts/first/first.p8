@@ -22,8 +22,6 @@ function _init()
 	player.speed = 2
 	player.jump_height = 15
 	player.moving = false
-	
-	game.message = player_in_floor()
 end
 
 function _update()
@@ -34,7 +32,7 @@ end
 function _draw()
 	cls() -- clear screen
 	spr(player.sprite, player.x, player.y)
-	print(game.message)
+	print(player.y)
 end
 
 function move_listener()
@@ -50,20 +48,32 @@ function move_listener()
 		update_spr()
 	end
 
-	-- if btn(2) then
-	-- 	player.moving = true
-	-- 	player.y -= player.speed
-	-- 	move()
-	-- end
-
-	-- if btn(3) then
+	-- if btn(3) then -- ducking
 	-- 	player.moving = true
 	-- 	player.y += player.speed
 	-- 	move()
 	-- end
 
-	if (btn(2) and player_in_floor()) then -- jump
-		jump()
+	if btn(2) then -- jump
+		if player_in_floor() then
+			player.goes_up = true 
+		end
+
+		if (player.goes_up and player.y > player_jump_height()) then
+			player.y -= player.speed
+		end
+
+		if (player.y <= player_jump_height()) then
+			player.goes_up = false
+		end
+	end
+
+	if not btn(2) and player.goes_up then
+		player.goes_up = false
+	end
+
+	if not player.goes_up and not player_in_floor() then
+		player.y += player.speed
 	end
 end
 
@@ -76,22 +86,12 @@ function update_spr()
 	end
 end
 
-function jump()
-	player.goes_up = true 
-
-	repeat
-		if (player.y == 55) then
-			player.goes_up = false
-		elseif (player.goes_up) then
-			player.y -= player.speed
-		elseif (not player.goes_up) then
-			player.y += player.speed
-		end
-	until player_in_floor() and not player.goes_up
-end
-
 function player_in_floor()
 	return player.y == game.floor_y
+end
+
+function player_jump_height()
+	return game.floor_y - player.jump_height
 end
 
 
